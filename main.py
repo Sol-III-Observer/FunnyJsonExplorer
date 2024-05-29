@@ -52,7 +52,7 @@ if __name__ == '__main__':
     if style not in ['tree', 'rectangle']:
         print('Style not found')
         sys.exit(0)
-    
+
     explorer = explorer.Explorer()
     explorer.load(file)
     explorer.print(style, icon)
