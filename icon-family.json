@@ -2,5 +2,9 @@
     "poker-face-family":{
         "intermediate": "♢",
         "leaf": "♤"
+    },
+    "poker-face-family-2":{
+        "intermediate": "♦",
+        "leaf": "♠"
     }
 }
