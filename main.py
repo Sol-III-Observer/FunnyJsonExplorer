@@ -3,8 +3,11 @@ import explorer
 import json
 
 def help(): # 帮助信息
-    print('')
-    print('')
+    print('usage: fje.exe [-f <file>] [-s <style>] [-i <icon-family>] [-h]')
+    print('options:')
+    print('  -f <file> : Specify the file path')
+    print('  -s <style> : Specify the style')
+    print('  -i <icon-family> : Specify the icon family')
     print('  -h : Display this help message')
 
 def load_icon(name):

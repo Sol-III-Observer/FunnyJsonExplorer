@@ -9,21 +9,28 @@ class AbstractPrinter(ABC):
     @classmethod
     def create(cls, style, icon):
         if style == 'tree':
-            return tree(icon)
+            return TreePrinter(icon)
         elif style == 'rectangle':
-            return rectangle(icon)
+            return RectanglePrinter(icon)
 
     @abstractmethod
     def print(self, data):
         pass
 
-class tree(AbstractPrinter):
+class BuildLine(ABC):
+    def __init__(self, icon):
+        self.icon = icon
+        self.lines = []
+
+    @abstractmethod
+    def build(self, data, level = 0, l = []):
+        pass
+
+class TreeLine(BuildLine):
     def __init__(self, icon):
         super().__init__(icon)
-    
-    def print(self, data, level = 0, l = []):
-        if data == {}:
-            return
+
+    def build(self, data, level = 0, l = []):
         pre = ""
         pre_list = copy.copy(l)
         for i in pre_list:
@@ -40,26 +47,34 @@ class tree(AbstractPrinter):
             if type(data[k]) == dict:
                 line += self.icon["intermediate"]
                 line += k
-                print(line)
-                self.print(data[k], level + 1, pre_list)
+                self.lines.append(line)
+                self.build(data[k], level + 1, pre_list)
             else:
                 line += self.icon["leaf"]
                 line += k
                 if data[k] != None:
                     line += ": " + data[k]
-                print(line)
+                self.lines.append(line)
             n -= 1
 
-class rectangle(AbstractPrinter):
+class TreePrinter(AbstractPrinter):
     def __init__(self, icon):
         super().__init__(icon)
     
-    def print(self, data, level = 0, l = [], bottom = True):
-        first = False
-        if level == 0:
-            first = True
+    def print(self, data):
         if data == {}:
             return
+        l = TreeLine(self.icon)
+        l.build(data)
+        for i in l.lines:
+            print(i)
+
+class RectangleLine(BuildLine):
+    def __init__(self, icon):
+        super().__init__(icon)
+        self.lines = []
+
+    def build(self, data, level = 0, l = []):
         pre = ""
         pre_list = copy.copy(l)
         for i in pre_list:
@@ -79,24 +94,37 @@ class rectangle(AbstractPrinter):
             for i in range(len(line), 40):
                 line += "─"
             line += "┤"
-            if first:
-                for i in range(len(line)):
-                    if line[i] == "├":
-                        line = line[0:i] + "┌" + line[i+1:]
-                    elif line[i] == "┤":
-                        line = line[0:i] + "┐" + line[i+1:]
-                first = False
-            if bottom and (n == 1) and type(data[k]) != dict:
-                line = "└" + line[1:]
-                for i in range(len(line)):
-                    if line[i] == "├" or line[i] == "│":
-                        line = line[0:i] + "┴" + line[i+1:]
-                    elif line[i] == "┤":
-                        line = line[0:i] + "┘" + line[i+1:]
-            print(line)
+            self.lines.append(line)
             if type(data[k]) == dict:
-                self.print(data[k], level + 1, pre_list, (n == 1) and bottom)
+                self.build(data[k], level + 1, pre_list)
             n -= 1
+
+class RectanglePrinter(AbstractPrinter):
+    def __init__(self, icon):
+        super().__init__(icon)
+    
+    def print(self, data):
+        if data == {}:
+            return
+        l = RectangleLine(self.icon)
+        l.build(data)
+        lines = l.lines.copy()
+
+        for i in range(len(lines[0])):
+            if lines[0][i] == "├":
+                lines[0] = lines[0][0:i] + "┌" + lines[0][i+1:]
+            elif lines[0][i] == "┤":
+                lines[0] = lines[0][0:i] + "┐" + lines[0][i+1:]
+
+        lines[-1] = "└" + lines[-1][1:]
+        for i in range(1, len(lines[-1])):
+            if lines[-1][i] == "├" or l.lines[-1][i] == "│":
+                lines[-1] = lines[-1][0:i] + "┴" + lines[-1][i+1:]
+            elif lines[-1][i] == "┤":
+                lines[-1] = lines[-1][0:i] + "┘" + lines[-1][i+1:]
+
+        for i in lines:
+            print(i)
 
 class Explorer:
     def __init__(self):
