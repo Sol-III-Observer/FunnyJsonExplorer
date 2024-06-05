@@ -3,7 +3,7 @@ import explorer
 import json
 
 def help(): # 帮助信息
-    print('usage: fje.exe [-f <file>] [-s <style>] [-i <icon-family>] [-h]')
+    print('Usage: python main.py [-f <file>] [-s <style>] [-i <icon-family>] [-h]')
     print('options:')
     print('  -f <file> : Specify the file path')
     print('  -s <style> : Specify the style')
