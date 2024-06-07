@@ -17,7 +17,7 @@ class AbstractPrinter(ABC):
     def print(self, data):
         pass
 
-class BuildLine(ABC):
+class LineBuilder(ABC):
     def __init__(self, icon):
         self.icon = icon
         self.lines = []
@@ -26,7 +26,7 @@ class BuildLine(ABC):
     def build(self, data, level = 0, l = []):
         pass
 
-class TreeLine(BuildLine):
+class TreeLine(LineBuilder):
     def __init__(self, icon):
         super().__init__(icon)
 
@@ -69,7 +69,7 @@ class TreePrinter(AbstractPrinter):
         for i in l.lines:
             print(i)
 
-class RectangleLine(BuildLine):
+class RectangleLine(LineBuilder):
     def __init__(self, icon):
         super().__init__(icon)
         self.lines = []
