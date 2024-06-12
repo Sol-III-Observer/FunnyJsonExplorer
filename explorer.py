@@ -72,7 +72,6 @@ class TreePrinter(AbstractPrinter):
 class RectangleLine(LineBuilder):
     def __init__(self, icon):
         super().__init__(icon)
-        self.lines = []
 
     def build(self, data, level = 0, l = []):
         pre = ""
