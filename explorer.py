@@ -2,6 +2,38 @@ import json
 from abc import ABC, abstractmethod
 import copy
 
+class lines:
+    def __init__(self):
+        self.__list = []
+        self.__len = 0
+
+    def append(self, line):
+        self.__list.append(line)
+        self.__len += 1
+
+    def get(self, index):
+        if index >= self.__len or index < 0:
+            return None
+        return self.__list[index]
+    
+    def __len__(self):
+        return self.__len
+
+class linesIterator:
+    def __init__(self, lines):
+        self.lines = lines
+        self.__index = 0
+
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if self.__index >= len(self.lines):
+            raise StopIteration
+        result = self.lines.get(self.__index)
+        self.__index += 1
+        return result
+
 class AbstractPrinter(ABC):
     def __init__(self, icon):
         self.icon = icon
@@ -20,7 +52,7 @@ class AbstractPrinter(ABC):
 class LineBuilder(ABC):
     def __init__(self, icon):
         self.icon = icon
-        self.lines = []
+        self.lines = lines()
 
     @abstractmethod
     def build(self, data, level = 0, l = []):
@@ -66,7 +98,7 @@ class TreePrinter(AbstractPrinter):
             return
         l = TreeLine(self.icon)
         l.build(data)
-        for i in l.lines:
+        for i in linesIterator(l.lines):
             print(i)
 
 class RectangleLine(LineBuilder):
@@ -107,23 +139,23 @@ class RectanglePrinter(AbstractPrinter):
             return
         l = RectangleLine(self.icon)
         l.build(data)
-        lines = l.lines.copy()
 
-        for i in range(len(lines[0])):
-            if lines[0][i] == "├":
-                lines[0] = lines[0][0:i] + "┌" + lines[0][i+1:]
-            elif lines[0][i] == "┤":
-                lines[0] = lines[0][0:i] + "┐" + lines[0][i+1:]
-
-        lines[-1] = "└" + lines[-1][1:]
-        for i in range(1, len(lines[-1])):
-            if lines[-1][i] == "├" or l.lines[-1][i] == "│":
-                lines[-1] = lines[-1][0:i] + "┴" + lines[-1][i+1:]
-            elif lines[-1][i] == "┤":
-                lines[-1] = lines[-1][0:i] + "┘" + lines[-1][i+1:]
-
-        for i in lines:
-            print(i)
+        for (i, line) in enumerate(linesIterator(l.lines)):
+            s = line
+            if i == 0:
+                for j in range(len(s)):
+                    if s[j] == "├":
+                        s = s[0:j] + "┌" + s[j+1:]
+                    elif s[j] == "┤":
+                        s = s[0:j] + "┐" + s[j+1:]
+            if i == len(l.lines) - 1:
+                s = "└" + s[1:]
+                for j in range(1, len(s)):
+                    if s[j] == "├" or s[j] == "│":
+                        s = s[0:j] + "┴" + s[j+1:]
+                    elif s[j] == "┤":
+                        s = s[0:j] + "┘" + s[j+1:]
+            print(s)
 
 class Explorer:
     def __init__(self):
